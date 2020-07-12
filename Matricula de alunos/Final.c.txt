@@ -1,0 +1,1203 @@
+#define _CRT_SECURE_NO_WARNINGS
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <windows.h>
+#include <string.h>
+
+//--------------------------------------------structs-----------------------------------------
+//struct para vincular aluno a discilina
+typedef struct {
+	char nomeA[20];
+	int codigo;
+	int ra;
+}vincularA;
+
+//struct para vincular disciplina e prof a turma:
+typedef struct {
+	int id;
+	int ra[15];//
+}turma;
+
+//struct para aluno:
+typedef struct {
+	char nome[20];
+	int ra;
+}dadosA;
+
+//struct para prof:
+typedef struct
+{
+	char nome[20];
+	int id;
+}dados;
+
+//struct para disciplina:
+typedef struct
+{
+	char nome[20];
+	int codigo;
+	turma turma1;
+	turma turma2;
+}curso;
+//-----------------------------------------------------------fim das structs0---------------------------------------------
+
+//---------------------------------------------------------protótipo das funcoes
+void menu();
+void cadastroA(dadosA aluno[], int tamanhovetor[]);
+void cadastroP(dados professor[], int tamanhovetor[]);
+void cadastroD(curso disciplina[], int tamanhovetor[]);
+void imprimircadastroA(dadosA aluno[], int tamanhovetor[]);
+void imprimir_cadastro_disciplinas(curso disciplina[], int tamanhovetor[]);
+void imprimir_cadastro_professores(dados professor[], int tamanhovetor[]);
+void matricula_alunos(dadosA aluno[], curso disciplina[], int tamanhovet[]);
+void vincular_professor(curso disciplina[], int tamanhovet[], dados professor[]);
+void cancelar_matricula_alunos(dadosA aluno[], curso disciplina[], int tamanhovet[]);
+void cancelar_vinculo_professor(curso disciplina[], int tamanhovet[], dados professor[]);
+void imprimir_lista_disciplinas_aluno(curso disciplina[], int tamanhovet[], dadosA aluno[]);
+void imprimir_lista_alunos_disciplina_turmaind(curso disciplina[], int tamanhovet[], dadosA aluno[]);
+void imprimir_lista_alunos_disciplina_turma(curso disciplina[], int tamanhovet[], dadosA aluno[]);
+void imprimir_disciplinas_professor(curso disciplina[], int tamanhovet[], dados professor[]);
+void lista_professores_disciplinas(curso disciplina[], int tamanhovet[], dados professor[]);
+
+//--------------------------------------------------INICIO DA MAIN-----------------------------------------------------------------------------------
+int main()
+{
+
+	menu();
+
+	system("pause");
+	return 0;
+}
+
+//------------------------------------------------------FIM DA MAIN---------------------------------------------
+
+//--------------------------------------------------------------INICIO DA FUNCAO MENU-------------------------------------------------------------------
+void menu()
+{
+	//--------------------------------------------Variaveis-----------------------------------------------
+	int condicao;
+	int vfq;
+	int tamanhovet[6];
+	//system("cls");
+		//-------------------------------------------------------------DECLARANDO VARIAVEIS de struct	-----------------------------------------------------
+	dadosA aluno[20];
+	dados professor[15];
+	curso disciplina[10];
+	//--------------------------------------------------------FIM DA VARIAVEIS----------------------------------------------------------------------------
+	do {
+		//--------------------------------------------------------COMECO DO PROGRAMA----------------------------------------------------------------------
+		system("cls");
+		printf(" Bem vindo a faculdade WORLDTECH\n");
+		//==================================================================================================================================================================	sleep(3);
+		printf("                   0- Para Sair\n");
+		printf("                   1- Para cadastro de Disciplina\n");
+		printf("                   2- Para cadastro de Professor\n");
+		printf("                   3- para cadastro de aluno\n");
+		printf("                   4- Para matricula de professor\n");
+		printf("                   5- Para matricula de aluno\n");
+		printf("                   6- Para imprimir cadastro dos Alunos\n");
+		printf("                   7- Para imprimir cadastro das Disciplinas\n");
+		printf("                   8- Para imprimir cadastro dos professores\n");
+		printf("                   9- Para cancelar matricula de alunos\n");
+		printf("                   10-Para cancelar vinculo com professor \n");
+		printf("                   11-Para imprimir lista de discplinas de um aluno \n");
+		printf("                   12-Para imprimir lista alunos de uma disciplina e turma independente\n");
+		printf("                   13-Para imprimir lista alunos de uma disciplina e turma\n");
+		printf("                   14-Para imprimir lista de disciplina de um professor \n");
+		printf("                   15-Para imprimir lista de professores em uma disciplina \n");
+		
+
+		printf("\n:");
+		scanf("%d", &vfq);
+		switch (vfq)
+		{
+		case 1:
+			cadastroD(disciplina, tamanhovet);
+
+			break;
+
+		case 2:
+			cadastroP(professor, tamanhovet);
+			break;
+
+		case 3:
+			cadastroA(aluno, tamanhovet);
+			break;
+
+		case 4:
+			vincular_professor(disciplina, tamanhovet, professor);
+				break;
+		case 5:
+			system("cls");
+
+			matricula_alunos(aluno, disciplina, tamanhovet);
+			system("pause");
+
+			break;
+
+		case 6:
+			imprimircadastroA(aluno, tamanhovet);
+
+			break;
+		case 7:
+			imprimir_cadastro_disciplinas(disciplina, tamanhovet);
+
+			break;
+		case 8:
+			imprimir_cadastro_professores(professor, tamanhovet);
+			break;
+		case 9:
+			cancelar_matricula_alunos(aluno, disciplina, tamanhovet);
+			break;
+		case 10:
+		    cancelar_vinculo_professor(disciplina, tamanhovet, professor);
+			break;
+		case 11:
+			imprimir_lista_disciplinas_aluno(disciplina, tamanhovet, aluno);
+			break;
+		case 12:
+		    imprimir_lista_alunos_disciplina_turmaind( disciplina, tamanhovet, aluno);
+			break;
+		case 13:
+			 imprimir_lista_alunos_disciplina_turma(disciplina, tamanhovet, aluno);
+				break;
+		case 14:
+			 imprimir_disciplinas_professor(disciplina, tamanhovet, professor);
+			break;
+		case 15:
+		     lista_professores_disciplinas( disciplina, tamanhovet, professor);
+
+			break;
+		}
+		
+
+		
+	} while (vfq < 15 && vfq>0);
+
+	//	=========================================================================================================================================================================sleep(3);
+
+}
+//----------------------------------------------------FIM DA FUNCAO MENU----------------------------------------------------------------------------------------
+
+//----------------------------------------------------INICIO DA FUNCAO ALUNO--------------------------------------------------------------------------------------
+void cadastroA(dadosA aluno[], int tamanhovet[])
+{
+	int i, ra, cond, j;
+	ra = 1; j = 1; i = 0; cond = 1;
+	//------------------------------------------------------
+	system("cls");
+	do
+	{
+		system("cls");
+		printf("\n---------------------------------Cadastrando alunos----------------------");
+		printf("\nDigite o nome do aluno:");
+		getchar();
+		scanf("%[^\n]s", aluno[i].nome);
+		getchar();
+		aluno[i].ra = ra;
+		tamanhovet[0] = j;
+		i++;
+		ra++;
+		j++;
+		printf("\n Deseja novo cadastro? (1=sim) (0=nao)");
+		scanf("%d", &cond);
+
+	} while (cond == 1);
+
+}
+//--------------------------------------------------FIM DA FUNCAO ALUNO------------------------------------------------------------------------------------------
+
+//--------------------------------------------------INICIO DA FUNCAO PROFESSOR----------------------------------------------------------------------------------
+void cadastroP(dados professor[], int tamanhovet[])
+{
+	int id, cond, i, j;
+	id = 1; i = 0; j = 1; cond = 1;
+
+	//--------------------------------------------------
+	system("cls");
+
+	printf("\n-----------------------Cadastrando Professores---------------------------------------");
+
+	do
+	{
+		system("cls");
+		printf("\nDigite o nome do professor: ");
+		getchar();
+		scanf("%[^\n]s", professor[i].nome);
+		getchar();
+		professor[i].id = id;
+		tamanhovet[1] = j;
+		i++;
+		j++;
+		id++;
+
+		printf("\n Deseja novo cadastro? (1=sim) (0=nao)");
+		scanf("%d", &cond);
+
+	} while (cond == 1);
+}
+//------------------------------------------------------FIM DA FUNCAO PROFESSOR----------------------------------------------------------------------------------
+
+//------------------------------------------------------ INICIO DA FUNCAO DISCIPLINA----------------------------------------------------------------------------
+void cadastroD(curso disciplina[], int tamanhovet[])
+{
+	int cond, i, codigo, j;
+	i = 0; cond = 0; j = 1; codigo = 1;
+	//--------------------------------------------------
+	system("cls");
+
+	do
+	{
+		system("cls");
+		printf("\n------------------------Cadastrando Disciplina--------------------------------------");
+		printf("\nDigite o nome da disciplina: ");
+		getchar();
+		scanf("%[^\n]s", disciplina[i].nome);
+		getchar();
+		disciplina[i].codigo = codigo;
+		tamanhovet[2] = j;
+		j++;
+		i++;
+		codigo++;
+		printf("\n\nDeseja novo cadastro? (1=sim) (0=nao)");
+		scanf("%d", &cond);
+
+	} while (cond == 1);
+	//==============================================================================================================================================ndisciplinas++;
+
+
+}
+//---------------------------------------------------FIM DA FUNCAO DISCIPLINA-----------------------------------------------------------------------------
+
+//---------------------------------------------------INCIO DA FUNCAO IMPRIMIR ALUNOS(CADASTRO)--------------------------------------------------------------------------
+void imprimircadastroA(dadosA aluno[], int tamanhovet[])
+{
+	int i;
+
+	for (i = 0; i < tamanhovet[0]; i++)
+	{
+		printf("\nNome do aluno: %s", aluno[i].nome);
+		printf("\n");
+		printf("Ra do aluno: %d\n\n", aluno[i].ra);
+
+	}
+	system("pause");
+}
+
+//---------------------------------------------------FIM DA FUNCAO IMPRIMIR ALUNOS------------------------------------------------------------------------------
+
+
+//---------------------------------------------------INICIO DA FUNCAO IMPRIMIR PROFESSOR(CADASTRO)------------------------------------------------------------------------
+void imprimir_cadastro_professores(dados professor[], int tamanhovet[])
+{
+	int i;
+
+	for (i = 0; i < tamanhovet[1]; i++)
+	{
+		printf("\n Nome do professor: %s", professor[i].nome);
+		printf("\n Id do professor: %d\n\n", professor[i].id);
+	}
+	system("pause");
+}
+
+//----------------------------------------------------- FIM DA FUNCAO IMPRIMIR PROFESSOR (CADASTRO)----------------------------------------------------------------
+
+
+//--------------------------------------------------INICIO DA FUNCAO IMPRIMIR DISCIPLINAS(CADASTRO)-----------------------------------------------------------------------
+void imprimir_cadastro_disciplinas(curso disciplina[], int tamanhovet[])
+{
+	int i;
+
+	for (i = 0; i < tamanhovet[2]; i++)
+	{
+		printf("\n Nome da disciplina: %s ", disciplina[i].nome);
+		printf("\nCodigo da disciplina: %d\n\n", disciplina[i].codigo);
+
+	}
+	system("pause");
+}
+
+//---------------------------------------------------FIM DA FUNCAO IMPRIMIR DISCIPLINAS(CADASTRO)---------------------------------------------------------------------------
+
+//-------------------------------------------------COMECO DA FUNCAO MATRICULA DE ALUNOS------------------------------------------------------------------------------
+void matricula_alunos(dadosA aluno[], curso disciplina[], int tamanhovet[])
+{
+	//contadoras
+	int i, j, k, cont, C, z, cont2;
+	k = 0; cont = 0; z = 0; cont2 = 0;
+	//verificacao de saida
+		int  parada, parada2;
+		     parada = 1;
+	//verificao do programa
+		int aux, aux2, aux3, cond_vincular;
+			aux = 0;  aux2 = 0; cond_vincular = 1;
+	//variaveis normais
+		int RA, codigo, tipoturma, posicao, alunos_vet[30], aluno_ra;  
+	        RA = 50;  posicao = 0; 
+
+	//***imprimircadastroA(aluno, tamanhovet);//printa os alunos cadastrados
+
+	do {
+		parada2 = 0; aux = 0;
+		system("cls");
+		imprimircadastroA(aluno, tamanhovet);//printa os alunos cadastrados
+		printf("\nDigite o ra do aluno: ");
+		scanf("%d", &RA);
+		for (i = 0; i < tamanhovet[0]; i++)
+		{
+			if (RA == aluno[i].ra)
+			{
+				printf("\n Aluno encontrado. \n");
+				aux = 1;
+				alunos_vet[k] = RA;
+				k++;
+				cont++;
+			}
+
+		}
+		if (aux != 1) printf("\nAluno nao encontrado.\n");
+		printf("\nDeseja buscar novamente? (1=sim) (0=nao) \n");
+		scanf("%d", &parada2);
+		
+	} while (parada2 ==1);
+
+	tamanhovet[3] = cont;
+
+
+	do {
+//vlidando disciplina 
+		codigo = 0; aux2 = 0;
+		system("cls");
+		imprimir_cadastro_disciplinas(disciplina, tamanhovet);
+		printf(" \nDigite o codigo da disciplina: ");
+		fflush(stdin);
+		scanf("%d", &codigo);
+		for (j = 0; j < tamanhovet[2]; j++)
+		{
+			if (codigo == disciplina[j].codigo)
+			{
+				aux2 = 1;
+				posicao = j;
+				cont2++;
+			}
+		}
+		tamanhovet[4] = cont2++;
+//inicio de inculacao de alunos com a disciplina
+		if (aux2 == 1)
+		{
+			printf("\nDigite a turma para a disciplina:");
+			fflush(stdin);
+			scanf("%d", &tipoturma);
+			if (tipoturma == 1)
+			{
+				do {
+					system("cls");
+					//imprimircadastroA(aluno, tamanhovet);//printa os alunos cadastrados 
+					printf("\n Vai printar os alunos escolhidos.");
+					printf("Vai printar as disciplinas escolhidas.");
+					//imprimir_cadastro_disciplinas(disciplina, tamanhovet);
+
+					aux3 = 0;
+					printf("\nTurma 1:\n Escolha o aluno que deseja vincular atraves do ra: ");
+					scanf("%d", &aluno_ra);
+					for (C = 0; C < cont; C++)
+					{
+						if (aluno_ra == alunos_vet[C])
+						{
+							printf("\n Aluno Vinculado. \n");
+							printf("\nvetor do aluno: %d", alunos_vet[C]);
+							aux3 = 1;
+							disciplina[posicao].turma1.ra[z] = aluno_ra;
+							// testeeeee printf("\n\ntestando: %d", disciplina[posicao].turma1.ra[z]);
+							z++;
+
+						}
+
+					}
+					if (aux3 == 1)
+					{
+						printf("\nDeseja buscar novamente? (0=nao) ");
+						scanf("%d", &cond_vincular);
+					}
+
+					if (aux3 != 1)
+					{
+						printf("\nra Invalido.");
+						printf("\nDeseja buscar novamente? (0=nao) ");
+						scanf("%d", &cond_vincular);
+
+					}
+				} while (cond_vincular != 0);
+				
+			}
+			if (tipoturma == 2)
+			{
+				do {
+					system("cls");
+					imprimircadastroA(aluno, tamanhovet);//printa os alunos cadastrados
+					imprimir_cadastro_disciplinas(disciplina, tamanhovet);
+
+					aux3 = 0;
+					printf("\nTurma 1:\n Escolha o aluno que deseja vincular atraves do ra: ");
+					scanf("%d", &aluno_ra);
+					for (C = 0; C < cont; C++)
+					{
+						if (aluno_ra == alunos_vet[C])
+						{
+							printf("\n Aluno Vinculado. \n");
+							printf("\nvetor do aluno: %d", alunos_vet[C]);
+							aux3 = 1;
+							disciplina[posicao].turma2.ra[z] = aluno_ra;
+							// testeeeee printf("\n\ntestando: %d", disciplina[posicao].turma2.ra[z]);
+							z++;
+
+						}
+
+					}
+					if (aux3 == 1)
+					{
+						printf("\nDeseja buscar novamente? (0=nao) ");
+						scanf("%d", &cond_vincular);
+					}
+					if (aux3 != 1)
+					{
+						printf("\nra Invalido.");
+						printf("\nDeseja buscar novamente? (0=nao) ");
+						scanf("%d", &cond_vincular);
+
+					}
+				} while (cond_vincular != 0);
+			}
+
+		
+		}
+
+		if (aux2 != 1) printf("\nDisciplina nao enconrada. ");
+
+		printf("\nDeseja buscar disciplina novamente: (1=sim) (0=nao)");
+		fflush(stdin);
+		scanf("%d", &parada);
+
+	} while (parada == 1);
+}
+
+//-------------------------------------------------------------------cancelar matricula-----------------------------------------------------------------------
+void cancelar_matricula_alunos(dadosA aluno[], curso disciplina[], int tamanhovet[])
+{
+//contadoras
+int i, j, k, cont, C, z;
+k = 0; cont = 0; z = 0;
+//verificacao de saida
+int  parada, parada2;
+parada = 1;
+//verificao do programa
+int aux, aux2, aux3, cond_vincular;
+aux = 0;  aux2 = 0; cond_vincular = 1;
+//variaveis normais
+int RA, codigo, tipoturma, posicao, alunos_vet[30], aluno_ra;
+RA = 50;  posicao = 0;
+
+//***imprimircadastroA(aluno, tamanhovet);//printa os alunos cadastrados
+
+do {
+//Valindando alunos
+	parada2 = 0; aux = 0;
+	system("cls");
+	imprimircadastroA(aluno, tamanhovet);//printa os alunos cadastrados
+	printf("\nDigite o ra do aluno: ");
+	scanf("%d", &RA);
+	for (i = 0; i < tamanhovet[0]; i++)
+	{
+		if (RA == aluno[i].ra)
+		{
+			printf("\n Aluno encontrado. \n");
+			aux = 1;
+			alunos_vet[k] = RA;
+			k++;
+			cont++;
+		}
+
+	}
+	if (aux != 1) printf("\nAluno nao encontrado.\n");
+
+	printf("\nDeseja buscar novamente? (1=sim) (0=nao) \n");
+	scanf("%d", &parada2);
+
+} while (parada2 == 1);
+//selecionando disciplinas para cancelar matricula
+do {
+
+	codigo = 0; aux2 = 0;
+	system("cls");
+	imprimir_cadastro_disciplinas(disciplina, tamanhovet);
+	printf(" \nDigite o codigo da disciplina: ");
+	fflush(stdin);
+	scanf("%d", &codigo);
+	for (j = 0; j < tamanhovet[2]; j++)
+	{
+		if (codigo == disciplina[j].codigo)
+		{
+			aux2 = 1;
+			posicao = j;
+		}
+	}
+
+	if (aux2 == 1)
+	{
+		printf("\nDigite a turma para a disciplina:");
+		fflush(stdin);
+		scanf("%d", &tipoturma);
+		//escolhemdo a turma
+		if (tipoturma == 1)
+		{
+			do {
+				system("cls");
+				imprimircadastroA(aluno, tamanhovet);//printa os alunos cadastrados
+				imprimir_cadastro_disciplinas(disciplina, tamanhovet);
+
+				aux3 = 0;
+				printf("\nTurma 1:\n Escolha o aluno que deseja cancelar a matricula (uso do ra): ");
+				scanf("%d", &aluno_ra);
+				for (C = 0; C < cont; C++)
+				{
+					if (aluno_ra == alunos_vet[C])
+					{
+						printf("\n Aluno Desvinculado. \n");
+						//printf("\nvetor do aluno: %d", alunos_vet[C]);
+						aux3 = 1;
+						disciplina[posicao].turma1.ra[z] =0;
+						printf("\n\nAluno cancelado= %d", disciplina[posicao].turma1.ra[z]);
+						// testeeeee printf("\n\ntestando: %d", disciplina[posicao].turma1.ra[z]);
+						z++;
+
+					}
+
+					if (aux3 == 1)
+					{
+						printf("\nDeseja buscar novamente? (0=nao) ");
+						scanf("%d", &cond_vincular);
+					}
+				}
+				if (aux3 != 1)
+				{
+					printf("\nra Invalido.");
+					printf("\nDeseja buscar novamente? (0=nao) ");
+					scanf("%d", &cond_vincular);
+
+				}
+			} while (cond_vincular != 0);
+
+		}
+		if (tipoturma == 2)
+		{
+			do {
+				system("cls");
+				imprimircadastroA(aluno, tamanhovet);//printa os alunos cadastrados
+				imprimir_cadastro_disciplinas(disciplina, tamanhovet);
+
+				aux3 = 0;
+				printf("\nTurma 1:\n Escolha o aluno que deseja cancelar a matricula (uso do ra): ");
+				scanf("%d", &aluno_ra);
+				for (C = 0; C < cont; C++)
+				{
+					if (aluno_ra == alunos_vet[C])
+					{
+						printf("\n Aluno Desvinculado. \n");
+						//printf("\nvetor do aluno: %d", alunos_vet[C]);
+						aux3 = 1;
+						disciplina[posicao].turma2.ra[z] = 0;
+						printf("\n\nAluno cancelado= %d", disciplina[posicao].turma2.ra[z]);
+						// testeeeee printf("\n\ntestando: %d", disciplina[posicao].turma2.ra[z]);
+						z++;
+
+					}
+
+					if (aux3 == 1)
+					{
+						printf("\nDeseja buscar novamente? (0=nao) ");
+						scanf("%d", &cond_vincular);
+					}
+				}
+				if (aux3 != 1)
+				{
+					printf("\nra Invalido.");
+					printf("\nDeseja buscar novamente? (0=nao) ");
+					scanf("%d", &cond_vincular);
+
+				}
+			} while (cond_vincular != 0);
+		}
+
+
+	}
+
+	if (aux2 != 1) printf("\nDisciplina nao enconrada. ");
+
+	printf("\nDeseja buscar disciplina novamente: (1=sim) (0=nao)");
+	fflush(stdin);
+	scanf("%d", &parada);
+
+} while (parada == 1);
+}
+
+//-----------------------------------------------------------vinculando professor-----------------------------------------------------------------
+
+void vincular_professor(curso disciplina[], int tamanhovet[], dados professor[])
+{
+	//variaveis do programa
+	int id, codigo, posicao;
+	//variaveis de verificação;
+	int parada, aux, parada2, aux2, tipo_turma, parada3;
+	parada = 1; parada2 = 1; parada3 = 1;  aux2 = 0; tipo_turma = 0;
+	//variaveis contadoras
+	int i, j, cont;
+	cont = 0;
+
+	do
+	{
+		aux = 0;
+		system("cls");
+		imprimir_cadastro_professores(professor, tamanhovet);
+
+		//Validacao do id do professor
+
+		printf("\nDigite o id do professor:");
+		scanf("%d", &id);
+		for (i = 0; i < tamanhovet[1]; i++)
+		{
+			if (id == professor[i].id)
+			{
+				aux = 1;
+				printf("\n Professor encontrado. ");
+				cont++;
+			}
+		}
+		tamanhovet[5] = cont;
+		if (aux == 0)
+		{
+			printf("\n Professor nao encontrado.");
+		}
+		//-----------------------------------------comecando a vincular-----------------------------------------------
+		if (aux == 1)
+		{
+			do {
+				system("cls");
+				imprimir_cadastro_disciplinas(disciplina, tamanhovet);
+
+				printf("\nDigite o codigo da disciplina que deseja vincular.");
+				scanf("%d", &codigo);
+
+				for (j = 0; j < tamanhovet[2]; j++)
+				{
+					if (codigo == disciplina[j].codigo)
+					{
+						aux2 = 1;
+						posicao = j;
+					}
+				}
+				if (aux2 == 1)
+				{
+					do {
+						printf("\nDiscplina encontrada.");
+						printf("\nDigite o numero da turma.");
+						scanf("%d", &tipo_turma);
+
+						if (tipo_turma == 1)
+						{
+							disciplina[posicao].turma1.id = id;
+							printf("\n\n id do professor na disciplina. %d", disciplina[posicao].turma1.id);
+							parada3 = 0;
+						}
+						if (tipo_turma == 2)
+						{
+							disciplina[posicao].turma2.id = id;
+							printf("\n\n professor na disciplina. %d", disciplina[posicao].turma2.id);
+							parada3 = 0;
+						}
+						if (tipo_turma != 1 && tipo_turma != 2)
+						{
+							printf("\nTurma nao encontrada. deseja tentar novamente? (1=sim) (0=nao) ");
+							scanf("%d", &parada3);
+
+						}
+					} while (parada3 == 1);
+				}
+
+				printf("\nPara encerrar a busca por disciplina digite 0: ");
+				scanf("%d", &parada2);
+			} while (parada2 == 1);
+		}
+
+		printf("\nPara encerrar a funcao digite 0. ");
+		scanf("%d", &parada);
+	} while (parada != 0);
+}
+//-----------------------------------------------------cancelar vinculo do professor----------------------------------------------
+
+void cancelar_vinculo_professor(curso disciplina[], int tamanhovet[], dados professor[])
+{
+
+		//variaveis do programa
+		int id, codigo, posicao;
+		//variaveis de verificação;
+		int parada, aux, parada2, aux2, tipo_turma, parada3;
+		parada = 1; parada2 = 1; parada3 = 1;  aux2 = 0; tipo_turma = 0;
+		//variaveis contadoras
+		int i, j;
+
+		do
+		{
+			aux = 0;
+			system("cls");
+			imprimir_cadastro_professores(professor, tamanhovet);
+
+			//Validacao do id do professor
+
+			printf("\nDigite o id do professor:");
+			scanf("%d", &id);
+			for (i = 0; i < tamanhovet[1]; i++)
+			{
+				if (id == professor[i].id)
+				{
+					aux = 1;
+					printf("\n Professor encontrado. ");
+				}
+			}
+
+			if (aux == 0)
+			{
+				printf("\n Professor nao encontrado.");
+			}
+			//-----------------------------------------comecando a vincular-----------------------------------------------
+			if (aux == 1)
+			{
+				do {
+					system("cls");
+					imprimir_cadastro_disciplinas(disciplina, tamanhovet);
+
+					printf("\nDigite o codigo da disciplina que deseja desvincular.");
+					scanf("%d", &codigo);
+
+					for (j = 0; j < tamanhovet[2]; j++)
+					{
+						if (codigo == disciplina[j].codigo)
+						{
+							aux2 = 1;
+							posicao = j;
+						}
+					}
+					if (aux2 == 1)
+					{
+						do {
+							printf("\nDiscplina encontrada.");
+							printf("\nDigite o numero da turma.");
+							scanf("%d", &tipo_turma);
+
+							if (tipo_turma == 1)
+							{
+								disciplina[posicao].turma1.id = 0;
+								printf("\n\n id do professor na disciplina. %d", disciplina[posicao].turma1.id);
+								printf("\n Deseja buscar novamente? (1=sim) (0=nao) ");
+								scanf("%d", &parada3);
+							}
+							if (tipo_turma == 2)
+							{
+								disciplina[posicao].turma2.id = 0;
+								printf("\n\n professor na disciplina. %d", disciplina[posicao].turma2.id);
+								printf("\n Deseja buscar novamente? (1=sim) (0=nao) ");
+								scanf("%d", &parada3);
+							}
+							if (tipo_turma != 1 && tipo_turma != 2)
+							{
+								printf("\nTurma nao encontrada. deseja tentar novamente? (1=sim) (0=nao) ");
+								scanf("%d", &parada3);
+
+							}
+						} while (parada3 == 1);
+					}
+
+					printf("Para encerrar a busca digite 0: ");
+					scanf("%d", &parada2);
+				} while (parada2 == 1);
+			}
+
+			printf("\nPara encerrar a funcao digite 0. ");
+			scanf("%d", &parada);
+		} while (parada != 0);
+}
+
+void imprimir_lista_disciplinas_aluno(curso disciplina[], int tamanhovet[], dadosA aluno[])
+{
+	//contadoras
+	int i, j, k, cont, A, z;
+	k = 0; cont = 0; z = 0; A = 0;
+	//verificacao de saida
+	int  parada, parada2;
+	parada = 1;
+	//verificao do programa
+	int aux, aux2, aux3, cond_vincular;
+	aux = 0;  aux2 = 0; cond_vincular = 1;
+	//variaveis normais
+	int RA, codigo, tipoturma, posicao, alunos_vet[30], aluno_ra, raprint, l;
+	RA = 50;  posicao = 0;
+
+	do {
+
+		do {
+			parada2 = 0; aux = 0;
+			system("cls");
+			imprimircadastroA(aluno, tamanhovet);//printa os alunos cadastrados
+			printf("\nDigite o ra do aluno: ");
+			scanf("%d", &RA);
+			for (i = 0; i < tamanhovet[0]; i++)
+			{
+				if (RA == aluno[i].ra)
+				{
+					printf("\n Aluno encontrado. \n");
+					aux = 1;
+					alunos_vet[k] = RA;
+					raprint = RA;
+					l = i;
+					k++;
+				}
+
+			}
+
+			if (aux == 1)
+			{
+				printf(" \nNome do aluno %s: ", aluno[l].nome);
+
+				for (j = 0; j < tamanhovet[4]; j++)
+				{
+					for (A = 0; A < tamanhovet[3]; A++)
+					{
+						if (disciplina[j].turma1.ra[A] == raprint)
+						{
+							printf("\nNome da disciplina: %s ", disciplina[j].nome);
+							aux2 = 1;
+						}
+						if (disciplina[j].turma2.ra[A] == raprint)
+						{
+							printf("\nNome da disciplina: %s ", disciplina[j].nome);
+							aux2 = 1;
+						}
+					}
+				}
+				if (aux2 != 1)
+				{
+					printf("Nenhuma Disciplina presente");
+				}	
+			}
+			if (aux != 1) printf("\nAluno nao encontrado.\n");
+
+			printf("\nDeseja buscar novamente? (1=sim) (0=nao) \n");
+			scanf("%d", &parada2);
+
+		} while (parada2 == 1);
+
+
+		printf("\nPara sair digite 0:");
+		scanf("%d", &parada);
+	} while (parada == 1);
+}
+
+void imprimir_lista_alunos_disciplina_turmaind(curso disciplina[], int tamanhovet[], dadosA aluno[])
+{
+	//contadoras
+	int i, j, k, cont, C, z;
+	k = 0; cont = 0; z = 0;
+	//verificacao de saida
+	int  parada, parada2;
+	parada = 1;
+	//verificao do programa
+	int aux, aux2, aux3, cond_vincular;
+	aux = 0;  aux2 = 0; cond_vincular = 1;
+	//variaveis normais
+	int RA, codigo, tipoturma, posicao, alunos_vet[30], aluno_ra;
+	RA = 50;  posicao = 0;
+
+	do {
+		//vlidando disciplina 
+		codigo = 0; aux2 = 0;
+		system("cls");
+		imprimir_cadastro_disciplinas(disciplina, tamanhovet);
+		printf(" \nDigite o codigo da disciplina: ");
+		fflush(stdin);
+		scanf("%d", &codigo);
+		for (j = 0; j < tamanhovet[2]; j++)
+		{
+			if (codigo == disciplina[j].codigo)
+			{
+				aux2 = 1;
+				posicao = j;
+				
+			}
+		}
+		//inicio de inculacao de alunos com a disciplina
+		if (aux2 == 1)
+		{
+			printf("\nDigite a turma para a disciplina:");
+			fflush(stdin);
+			scanf("%d", &tipoturma);
+			if (tipoturma == 1)
+			{
+				for (i = 0; i < tamanhovet[3]; i++)
+				{
+					for (C = 0; C < tamanhovet[0]; C++)
+					{
+						if (disciplina[posicao].turma1.ra[i] == aluno[C].ra)
+							printf("\nNome do aluno: %s", aluno[C].nome);
+					}
+					printf("\nRa do aluno: %d ", disciplina[posicao].turma1.ra[i]);
+				}
+			}
+			if (tipoturma == 2)
+			{
+				for (i = 0; i < tamanhovet[3]; i++)
+				{
+					for (C = 0; C < tamanhovet[0]; C++)
+					{
+						if (disciplina[posicao].turma2.ra[i] == aluno[C].ra)
+							printf("\nNome do aluno: %s", aluno[C].nome);
+					}
+					printf("\nRa do aluno: %d ", disciplina[posicao].turma2.ra[i]);
+				}
+			}
+		      printf("\nDeseja buscar disciplina novamente: (1=sim) (0=nao)");
+			  fflush(stdin);
+			  scanf("%d", &parada);	
+		}
+
+		if (aux2 != 1) printf("\nDisciplina nao enconrada. ");
+
+	} while (parada == 1);
+}
+
+void imprimir_lista_alunos_disciplina_turma(curso disciplina[], int tamanhovet[], dadosA aluno[])
+{
+	//contadoras
+	int i, j, k, cont, C, z;
+	k = 0; cont = 0; z = 0;
+	//verificacao de saida
+	int  parada, parada2;
+	parada = 1;
+	//verificao do programa
+	int aux, aux2, aux3, cond_vincular;
+	aux = 0;  aux2 = 0; cond_vincular = 1;
+	//variaveis normais
+	int RA, codigo, tipoturma, posicao, alunos_vet[30], aluno_ra;
+	RA = 50;  posicao = 0;
+
+	do {
+		//vlidando disciplina 
+		codigo = 0; aux2 = 0;
+		system("cls");
+		imprimir_cadastro_disciplinas(disciplina, tamanhovet);
+		printf(" \nDigite o codigo da disciplina: ");
+		fflush(stdin);
+		scanf("%d", &codigo);
+		for (j = 0; j < tamanhovet[2]; j++)
+		{
+			if (codigo == disciplina[j].codigo)
+			{
+				aux2 = 1;
+				posicao = j;
+
+			}
+		}
+		//inicio de inculacao de alunos com a disciplina
+		if (aux2 == 1)
+		{
+				for (i = 0; i < tamanhovet[3]; i++)
+				{
+					for (C = 0; C < tamanhovet[0]; C++)
+					{
+						if (disciplina[posicao].turma1.ra[i] == aluno[C].ra)
+							printf("\nNome do aluno: %s", aluno[C].nome);
+						if (disciplina[posicao].turma2.ra[i] == aluno[C].ra)
+							printf("\nNome do aluno: %s", aluno[C].nome);
+					}
+					printf("\nRa do aluno: %d ", disciplina[posicao].turma1.ra[i]);
+				}
+			
+			
+			printf("\nDeseja buscar disciplina novamente: (1=sim) (0=nao)");
+			fflush(stdin);
+			scanf("%d", &parada);
+		}
+
+		if (aux2 != 1) printf("\nDisciplina nao enconrada. ");
+
+	} while (parada == 1);
+}
+void imprimir_disciplinas_professor(curso disciplina[], int tamanhovet[], dados professor[])
+{
+
+	//contadoras
+	int i, j, k, cont, A, z;
+	k = 0; cont = 0; z = 0; A = 0;
+	//verificacao de saida
+	int  parada, parada2;
+	parada = 1;
+	//verificao do programa
+	int aux, aux2, aux3, cond_vincular;
+	aux = 0;  aux2 = 0; cond_vincular = 1;
+	//variaveis normais
+	int RA, codigo, tipoturma, posicao, alunos_vet[30], aluno_ra, idprint, id;
+	RA = 50;  posicao = 0;
+
+	do
+	{
+		aux = 0;
+		system("cls");
+		imprimir_cadastro_professores(professor, tamanhovet);
+
+		//Validacao do id do professor
+
+		printf("\nDigite o id do professor:");
+		scanf("%d", &id);
+		for (i = 0; i < tamanhovet[1]; i++)
+		{
+			if (id == professor[i].id)
+			{
+				aux = 1;
+				idprint = id;
+				printf("\n Professor encontrado. ");
+			}
+		}
+
+		if (aux == 0)
+		{
+			printf("\n Professor nao encontrado.");
+		}
+		//-----------------------------------------comecando a vincular-----------------------------------------------
+		if (aux == 1)
+		{
+			printf("\nDigite a turma para o professor:");
+			fflush(stdin);
+			scanf("%d", &tipoturma);
+			do {
+				if (tipoturma == 1)
+				{
+					for (j = 0; j < tamanhovet[2]; j++)
+					{
+						if (idprint == disciplina[j].turma1.id)
+						{
+							printf("\n Nome da disciplina: %s", disciplina[j].nome);
+							parada2 = 1;
+						}
+
+					}
+				}
+				if (tipoturma == 2)
+				{
+					for (A = 0; A < tamanhovet[2]; A++)
+						if (idprint == disciplina[A].turma2.id)
+						{
+							printf("\n Nome da disciplina: %s", disciplina[j].nome);
+							parada2 = 1;
+						}
+				}
+				printf("\nTurma invalida digite. Tentar novamente? (1=sim) (0=nao)");
+				scanf("%d", &parada2);
+			} while (parada2 = 0);
+		}
+
+		printf("\nPara encerrar a funcao digite 0. ");
+		scanf("%d", &parada);
+	} while (parada != 0);
+}
+void lista_professores_disciplinas(curso disciplina[], int tamanhovet[], dados professor[])
+{
+	//contadoras
+	int i, j, k, cont, C, z, cont2;
+	k = 0; cont = 0; z = 0; cont2 = 0;
+	//verificacao de saida
+	int  parada, parada2;
+	parada = 1;
+	//verificao do programa
+	int aux, aux2, aux3, cond_vincular;
+	aux = 0;  aux2 = 0; cond_vincular = 1;
+	//variaveis normais
+	int RA, codigo, tipoturma, posicao, alunos_vet[30], aluno_ra;
+	RA = 50;  posicao = 0;
+
+
+	do {
+		//vlidando disciplina 
+		codigo = 0; aux2 = 0;
+		system("cls");
+		imprimir_cadastro_disciplinas(disciplina, tamanhovet);
+		printf(" \nDigite o codigo da disciplina: ");
+		fflush(stdin);
+		scanf("%d", &codigo);
+		for (j = 0; j < tamanhovet[2]; j++)
+		{
+			if (codigo == disciplina[j].codigo)
+			{
+				aux2 = 1;
+				posicao = j;
+			}
+		}
+		//inicio de inculacao de alunos com a disciplina
+		if (aux2 == 1)
+		{
+			printf("\nDigite a turma para a disciplina:");
+			fflush(stdin);
+			scanf("%d", &tipoturma);
+			if (tipoturma == 1)
+			{
+				
+				do {
+					for (C = 0; C < tamanhovet[1]; C++)
+					{
+						if (disciplina[posicao].turma1.id == professor[C].id)
+						{
+							printf("\nNome do professor: %s", professor[C].nome);
+							cond_vincular = 0;
+						}
+					}
+					for (i = 0; i < tamanhovet[5]; i++)
+					{
+						printf("\nId do professor: %d", disciplina[posicao].turma1.id);
+						cond_vincular = 0;
+					}
+				} while (cond_vincular != 0);
+
+			}
+			if (tipoturma == 2)
+			{
+				do {
+
+					for (C = 0; C < tamanhovet[1]; C++)
+					{
+						if (disciplina[posicao].turma2.id == professor[C].id)
+						{
+							printf("\nNome do professor: %s", professor[C].nome);
+							cond_vincular = 0;
+						}
+					}
+					for (i = 0; i < tamanhovet[5]; i++)
+					{
+						printf("\nId do professor: %d", disciplina[posicao].turma1.id);
+						cond_vincular = 0;
+					}
+				} while (cond_vincular != 0);
+			}
+
+
+		}
+
+		if (aux2 != 1) printf("\nDisciplina nao enconrada. ");
+
+		printf("\nDeseja buscar disciplina novamente: (1=sim) (0=nao)");
+		fflush(stdin);
+		scanf("%d", &parada);
+
+	} while (parada == 1);
+}
+
+
+ 
+	
